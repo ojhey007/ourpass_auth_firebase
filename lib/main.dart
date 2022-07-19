@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ourpass/screens/login/view/login.dart';
+import 'package:ourpass/screens/login/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ourpass Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.cyan,
       ),
       home: LoginPage(
         title: 'Ourpass Firebase Auth',
