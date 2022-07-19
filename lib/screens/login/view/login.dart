@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:ourpass/globals/widgets/form_spacer.dart';
 import 'package:ourpass/screens/login/controller/login_controller.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,6 +14,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   late String _email;
+  dynamic emailError = null;
   late String _password;
   @override
   Widget build(BuildContext context) {
@@ -37,6 +40,9 @@ class _LoginPageState extends State<LoginPage> {
                               val!.isEmpty ? 'Email can\'t be empty.' : null,
                           onSaved: (val) => _email = val!,
                         ),
+                        const FormSpacer(
+                          isVertical: true,
+                        ),
                         TextFormField(
                           key: const Key('password'),
                           decoration:
@@ -46,11 +52,28 @@ class _LoginPageState extends State<LoginPage> {
                               val!.isEmpty ? 'Password can\'t be empty.' : null,
                           onSaved: (val) => _password = val!,
                         ),
-                        const ElevatedButton(
-                            key: Key('login'),
-                            onPressed: validateAndSaveForm,
-                            child: Text('Login',
-                                style: TextStyle(fontSize: 20.0))),
+                        const FormSpacer(
+                          isVertical: true,
+                        ),
+                        Row(
+                          children: const [
+                            Expanded(
+                              child: ElevatedButton(
+                                  key: Key('loginButton'),
+                                  onPressed: validateAndSaveForm,
+                                  child: Text('Login',
+                                      style: TextStyle(fontSize: 20.0))),
+                            ),
+                            FormSpacer(isVertical: false),
+                            Expanded(
+                              child: ElevatedButton(
+                                  key: Key('registerButton'),
+                                  onPressed: validateAndSaveForm,
+                                  child: Text('Register',
+                                      style: TextStyle(fontSize: 20.0))),
+                            )
+                          ],
+                        )
                       ],
                     )),
               ],
