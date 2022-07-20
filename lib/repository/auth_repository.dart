@@ -1,11 +1,21 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:ourpass/models/user_model.dart';
 
 class AuthRepository {
-  final FirebaseAuth _firebaseAuth;
+  final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
 
-  AuthRepository(this._firebaseAuth);
+  AuthRepository();
 
-  Stream<User?> get authStateChanges => _firebaseAuth.idTokenChanges();
+  User? userFromFirebase(auth.User? user) {
+    if (user == null) {
+      return null;
+    }
+    return User(user.uid, user.email, user.emailVerified);
+  }
+
+  Stream<User?>? get user {
+    return _firebaseAuth.authStateChanges().map((userFromFirebase));
+  }
 
   Future<String?> signUp(
       {required String email, required String password}) async {
@@ -15,21 +25,21 @@ class AuthRepository {
         password: password,
       );
       return "Signed up";
-    } on FirebaseAuthException catch (e) {
+    } on auth.FirebaseAuthException catch (e) {
       print("Hmmm${e.message}");
       return (e.message);
     }
   }
 
-  Future<String?> signIn(
+  Future<dynamic> signIn(
       {required String email, required String password}) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return "Signed in";
-    } on FirebaseAuthException catch (e) {
+      return userFromFirebase(credential.user);
+    } on auth.FirebaseAuthException catch (e) {
       return (e.message);
     }
   }

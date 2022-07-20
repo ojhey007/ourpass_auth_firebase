@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ourpass/global/utils/app_modal.dart';
 import 'package:ourpass/global/utils/navigation_fn.dart';
 import 'package:ourpass/global/widgets/custom_elevated_button.dart';
 import 'package:ourpass/global/widgets/form_spacer.dart';
 import 'package:ourpass/repository/auth_repository.dart';
 import 'package:ourpass/screens/login/login.dart';
-import 'package:ourpass/screens/login/model/user_model.dart';
 import 'package:provider/provider.dart';
 
 class SignUp extends StatefulWidget {
@@ -18,9 +18,6 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  late String _email = "";
-  late String _password;
-
   final signupFormKey = GlobalKey<FormState>();
 
   String? emailError;
@@ -48,10 +45,17 @@ class _SignUpState extends State<SignUp> {
 
   registerUser() async {
     if (validateAndSaveForm()) {
-      context.read<AuthRepository>().signUp(
+      showLoadingDialog(context);
+      context
+          .read<AuthRepository>()
+          .signUp(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
-          );
+          )
+          .then((value) {
+        Navigator.of(context).pop();
+        showErrorMessage(context, value);
+      });
     }
   }
 
@@ -138,7 +142,6 @@ class _SignUpState extends State<SignUp> {
           child: OurpassElevatedButton(
             buttonIdentifier: 'registerButton',
             onPressed: registerUser,
-            // onPressed: () => ,
             isIconButton: false,
             buttonLabel: 'Register',
             color: Colors.amber,
@@ -155,7 +158,6 @@ class _SignUpState extends State<SignUp> {
       obscureText: true,
       controller: _passwordController,
       validator: (val) => val!.isEmpty ? 'Password can\'t be empty.' : null,
-      onSaved: (val) => _password = val!,
     );
   }
 
@@ -165,7 +167,6 @@ class _SignUpState extends State<SignUp> {
       decoration: InputDecoration(labelText: 'Email', errorText: emailError),
       controller: _emailController,
       validator: (val) => val!.isEmpty ? 'Email can\'t be empty.' : null,
-      onSaved: (val) => _email = val!,
     );
   }
 }
