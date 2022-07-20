@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "910778760480",
+    "project_id": "ourpass-firebase-auth",
+    "storage_bucket": "ourpass-firebase-auth.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:910778760480:android:eabb66b7d1049e0f29eb45",
+        "android_client_info": {
+          "package_name": "com.example.ourpass"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "910778760480-pcb63fd9bku786dse6ocferlp1p5lito.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcuWQpTsiFqN0ElNEZcD0r0c6pLI1Sbjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "910778760480-pcb63fd9bku786dse6ocferlp1p5lito.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

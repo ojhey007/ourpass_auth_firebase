@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ourpass/globals/app_material_page_route.dart';
-import 'package:ourpass/globals/navigation_fn.dart';
-import 'package:ourpass/globals/widgets/custom_elevated_button.dart';
-import 'package:ourpass/globals/widgets/form_spacer.dart';
+import 'package:ourpass/global/utils/app_material_page_route.dart';
+import 'package:ourpass/global/utils/navigation_fn.dart';
+import 'package:ourpass/global/widgets/custom_elevated_button.dart';
+import 'package:ourpass/global/widgets/form_spacer.dart';
 import 'package:ourpass/screens/sign_up/sign_up.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key? key, required this.title}) : super(key: key);
+  LoginPage({Key? key}) : super(key: key);
 
-  final String title;
+  String title = "Ourpass Firebase Auth";
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   gotoRegister() {
-    push(context: context, page: SignUp(title: 'Sign Up'));
+    push(context: context, page: SignUp());
   }
 
   @override
@@ -82,72 +82,84 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        TextFormField(
-                          key: const Key('email'),
-                          decoration: InputDecoration(
-                              labelText: 'Email', errorText: emailError),
-                          controller: loginEmailController,
-                          validator: (val) =>
-                              val!.isEmpty ? 'Email can\'t be empty.' : null,
-                          onSaved: (val) => _email = val!,
-                        ),
+                        emailField(),
                         const FormSpacer(
                           isVertical: true,
                         ),
-                        TextFormField(
-                          key: const Key('password'),
-                          decoration:
-                              const InputDecoration(labelText: 'Password'),
-                          obscureText: true,
-                          controller: loginPasswordController,
-                          validator: (val) =>
-                              val!.isEmpty ? 'Password can\'t be empty.' : null,
-                          onSaved: (val) => _password = val!,
-                        ),
+                        passwordField(),
                         const FormSpacer(
                           isVertical: true,
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: OurpassElevatedButton(
-                              buttonIdentifier: 'registerButton',
-                              buttonLabel: "Login",
-                              color: Colors.cyan,
-                              isIconButton: false,
-                              onPressed: validateAndSaveForm,
-                            )),
-                            const FormSpacer(isVertical: false),
-                            const OurpassElevatedButton(
-                              color: Colors.amber,
-                              isIconButton: true,
-                              onPressed: null,
-                              iconData: Icons.fingerprint,
-                              buttonIdentifier: 'FingerPrintButton',
-                            )
-                          ],
-                        )
+                        loginButton(),
+                        registerRoute()
                       ],
                     )),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("New user? "),
-                      GestureDetector(
-                        onTap: gotoRegister,
-                        child: const Text(
-                          "Register",
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                )
               ],
             )));
+  }
+
+  Padding registerRoute() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text("New user? "),
+          GestureDetector(
+            onTap: gotoRegister,
+            child: const Text(
+              "Register",
+              style: TextStyle(
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Row loginButton() {
+    return Row(
+      children: [
+        Expanded(
+            child: OurpassElevatedButton(
+          buttonIdentifier: 'registerButton',
+          buttonLabel: "Login",
+          color: Colors.cyan,
+          isIconButton: false,
+          onPressed: validateAndSaveForm,
+        )),
+        const FormSpacer(isVertical: false),
+        const OurpassElevatedButton(
+          color: Colors.amber,
+          isIconButton: true,
+          onPressed: null,
+          iconData: Icons.fingerprint,
+          buttonIdentifier: 'FingerPrintButton',
+        )
+      ],
+    );
+  }
+
+  TextFormField passwordField() {
+    return TextFormField(
+      key: const Key('password'),
+      decoration: const InputDecoration(labelText: 'Password'),
+      obscureText: true,
+      controller: loginPasswordController,
+      validator: (val) => val!.isEmpty ? 'Password can\'t be empty.' : null,
+      onSaved: (val) => _password = val!,
+    );
+  }
+
+  TextFormField emailField() {
+    return TextFormField(
+      key: const Key('email'),
+      decoration: InputDecoration(labelText: 'Email', errorText: emailError),
+      controller: loginEmailController,
+      validator: (val) => val!.isEmpty ? 'Email can\'t be empty.' : null,
+      onSaved: (val) => _email = val!,
+    );
   }
 }
