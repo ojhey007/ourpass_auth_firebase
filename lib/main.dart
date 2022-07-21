@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ourpass/global/utils/app_modal.dart';
 import 'package:ourpass/models/user_model.dart';
 import 'package:ourpass/repository/auth_repository.dart';
 import 'package:ourpass/screens/login/login.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:ourpass/screens/verify_email/verify_email.dart';
 import 'package:provider/provider.dart';
 import 'screens/home_page/home_page.dart';
 
@@ -45,7 +47,7 @@ class AuthWrapper extends StatelessWidget {
         ) {
           if (snapshot.connectionState == ConnectionState.active) {
             final User? user = snapshot.data;
-            return user == null ? LoginPage() : HomePage();
+            return user == null ? LoginPage() : VerifyEmail();
           }
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));

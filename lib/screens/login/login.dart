@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ourpass/global/utils/app_material_page_route.dart';
@@ -8,6 +10,7 @@ import 'package:ourpass/global/widgets/form_spacer.dart';
 import 'package:ourpass/repository/auth_repository.dart';
 import 'package:ourpass/screens/home_page/home_page.dart';
 import 'package:ourpass/screens/sign_up/sign_up.dart';
+import 'package:ourpass/screens/verify_email/verify_email.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,6 +24,39 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final loginFormKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Form(
+                    key: loginFormKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        emailField(),
+                        const FormSpacer(
+                          isVertical: true,
+                        ),
+                        passwordField(),
+                        const FormSpacer(
+                          isVertical: true,
+                        ),
+                        loginButton(),
+                        registerRoute()
+                      ],
+                    )),
+              ],
+            )));
+  }
 
   String? emailError;
   late TextEditingController _emailController;
@@ -56,15 +92,14 @@ class _LoginPageState extends State<LoginPage> {
           .signIn(
               email: _emailController.text.trim(),
               password: _passwordController.text.trim())
-          .then((value) => checkForDialog())
-          .onError((error, stackTrace) =>
-              showErrorMessage(context, error.toString()));
+          .then((value) => checkForDialog(value));
     }
   }
 
-  checkForDialog() async {
+  checkForDialog(value) async {
     Navigator.pop(context);
-    push(context: context, page: HomePage());
+    if (value.runtimeType == String) showErrorMessage(context, value);
+    // push(context: context, page: const VerifyEmail());
   }
 
   @override
@@ -83,39 +118,6 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Form(
-                    key: loginFormKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        emailField(),
-                        const FormSpacer(
-                          isVertical: true,
-                        ),
-                        passwordField(),
-                        const FormSpacer(
-                          isVertical: true,
-                        ),
-                        loginButton(),
-                        registerRoute()
-                      ],
-                    )),
-              ],
-            )));
   }
 
   Padding registerRoute() {

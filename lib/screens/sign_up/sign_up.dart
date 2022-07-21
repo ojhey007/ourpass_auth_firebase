@@ -6,6 +6,7 @@ import 'package:ourpass/global/widgets/custom_elevated_button.dart';
 import 'package:ourpass/global/widgets/form_spacer.dart';
 import 'package:ourpass/repository/auth_repository.dart';
 import 'package:ourpass/screens/login/login.dart';
+import 'package:ourpass/screens/verify_email/verify_email.dart';
 import 'package:provider/provider.dart';
 
 class SignUp extends StatefulWidget {
@@ -23,63 +24,7 @@ class _SignUpState extends State<SignUp> {
   String? emailError;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-
-  bool validateAndSaveForm() {
-    final form = signupFormKey.currentState;
-    if (!RegExp(
-            r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-        .hasMatch(_emailController.text)) {
-      setState(() {
-        emailError = "Enter a Valid email";
-      });
-      return false;
-    } else if (form!.validate()) {
-      setState(() {
-        emailError = null;
-      });
-      form.save();
-      return true;
-    }
-    return false;
-  }
-
-  registerUser() async {
-    if (validateAndSaveForm()) {
-      showLoadingDialog(context);
-      context
-          .read<AuthRepository>()
-          .signUp(
-            email: _emailController.text.trim(),
-            password: _passwordController.text.trim(),
-          )
-          .then((value) {
-        Navigator.of(context).pop();
-        showErrorMessage(context, value);
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    initControllers();
-    super.initState();
-  }
-
-  initControllers() {
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
-  }
-
-  signIn() {
-    pushUntil(context: context, page: LoginPage());
-  }
-
-  @override
-  dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  late TextEditingController _confirmPasswordController;
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +48,10 @@ class _SignUpState extends State<SignUp> {
                           isVertical: true,
                         ),
                         passwordField(),
+                        const FormSpacer(
+                          isVertical: true,
+                        ),
+                        confirmPasswordField(),
                         const FormSpacer(
                           isVertical: true,
                         ),
@@ -161,6 +110,17 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
+  TextFormField confirmPasswordField() {
+    return TextFormField(
+      key: const Key('confirm_password'),
+      decoration: const InputDecoration(labelText: 'Confirm Password'),
+      obscureText: true,
+      controller: _confirmPasswordController,
+      validator: (val) =>
+          _passwordController.text != val ? 'Passwords do not match' : null,
+    );
+  }
+
   TextFormField emailField() {
     return TextFormField(
       key: const Key('email'),
@@ -168,5 +128,64 @@ class _SignUpState extends State<SignUp> {
       controller: _emailController,
       validator: (val) => val!.isEmpty ? 'Email can\'t be empty.' : null,
     );
+  }
+
+  bool validateAndSaveForm() {
+    final form = signupFormKey.currentState;
+    if (!RegExp(
+            r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+        .hasMatch(_emailController.text)) {
+      setState(() {
+        emailError = "Enter a Valid email";
+      });
+      return false;
+    } else if (form!.validate()) {
+      setState(() {
+        emailError = null;
+      });
+      form.save();
+      return true;
+    }
+    return false;
+  }
+
+  registerUser() async {
+    if (validateAndSaveForm()) {
+      showLoadingDialog(context);
+      context
+          .read<AuthRepository>()
+          .signUp(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          )
+          .then((value) {
+        Navigator.pop(context);
+        push(context: context, page: VerifyEmail());
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initControllers();
+    super.initState();
+  }
+
+  initControllers() {
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+  }
+
+  signIn() {
+    pushUntil(context: context, page: LoginPage());
+  }
+
+  @override
+  dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 }
