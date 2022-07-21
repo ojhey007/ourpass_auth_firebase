@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ourpass/global/utils/app_modal.dart';
@@ -8,6 +9,8 @@ import 'package:ourpass/repository/auth_repository.dart';
 import 'package:ourpass/screens/login/login.dart';
 import 'package:ourpass/screens/verify_email/verify_email.dart';
 import 'package:provider/provider.dart';
+
+import '../home_page/home_page.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -159,10 +162,27 @@ class _SignUpState extends State<SignUp> {
             password: _passwordController.text.trim(),
           )
           .then((value) {
-        Navigator.pop(context);
-        push(context: context, page: VerifyEmail());
-        // showErrorMessage(context, value);
+        checkForDialog(value);
       });
+    }
+  }
+
+  checkForDialog(value) async {
+    //close the loading dialog
+    Navigator.pop(context);
+    if (value.runtimeType == String) {
+      showErrorMessage(context, value);
+    }
+    bool isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+
+    // check if user email has been verified
+    if (isEmailVerified) {
+      //if verified move the user to home page
+      push(context: context, page: const HomePage());
+    } else {
+      //if unverified move the user to verify page
+
+      push(context: context, page: const VerifyEmail());
     }
   }
 
