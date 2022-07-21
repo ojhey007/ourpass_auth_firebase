@@ -5,7 +5,7 @@ Future<List> initBiometricAuthentication() async {
   LocalAuthentication localAuth = LocalAuthentication();
   try {
     bool authenticateWithBiometricsResponse = await localAuth.authenticate(
-      localizedReason: 'Scan your fingerprint to authenticate',
+      localizedReason: 'Scan your fingerprint or face ID to authenticate',
       // useErrorDialogs: false,
       // stickyAuth: true
     );

@@ -21,6 +21,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
   @override
   void initState() {
     super.initState();
+    // check user's email verification status;
     isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     if (!isEmailVerified) {
       context.read<AuthRepository>().verifyEmail();
@@ -35,6 +36,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
   @override
   void dispose() {
+    // cancel timer when no longer in use to avoid memory leak
     timer?.cancel();
     super.dispose();
   }
@@ -50,7 +52,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
   @override
   Widget build(BuildContext context) {
     return isEmailVerified
-        ? HomePage()
+        ? const HomePage()
         : Scaffold(
             body: Column(
               mainAxisAlignment: MainAxisAlignment.center,

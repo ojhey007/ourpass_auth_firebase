@@ -161,6 +161,7 @@ class _SignUpState extends State<SignUp> {
           .then((value) {
         Navigator.pop(context);
         push(context: context, page: VerifyEmail());
+        // showErrorMessage(context, value);
       });
     }
   }
@@ -172,6 +173,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   initControllers() {
+    // initializes the following controller
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
@@ -183,6 +185,7 @@ class _SignUpState extends State<SignUp> {
 
   @override
   dispose() {
+    // dispose the following controllers to avoid memory leak
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();

@@ -1,15 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
-import 'package:ourpass/global/utils/app_constant.dart';
-import 'package:ourpass/global/utils/app_modal.dart';
 import 'package:ourpass/models/user_model.dart';
-import 'package:ourpass/repository/storage_repository.dart';
 
 class AuthRepository {
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
-  final SecureStorageRepository _secureStorageRepository =
-      SecureStorageRepository();
-
   AuthRepository();
 
   User? userFromFirebase(auth.User? user) {
@@ -22,6 +16,8 @@ class AuthRepository {
   Stream<User?>? get user {
     return _firebaseAuth.authStateChanges().map((userFromFirebase));
   }
+
+// signup method
 
   Future<dynamic> signUp(
       {required String email, required String password}) async {
@@ -36,6 +32,8 @@ class AuthRepository {
     }
   }
 
+// method to sign in with email and password
+
   Future<dynamic> signIn(
       {required BuildContext context,
       required String email,
@@ -47,11 +45,11 @@ class AuthRepository {
       );
       return userFromFirebase(credential.user);
     } on auth.FirebaseAuthException catch (e) {
-      print(e.message);
       return (e.message);
     }
   }
 
+// method for email verification
   Future<dynamic> verifyEmail() async {
     try {
       final user = auth.FirebaseAuth.instance.currentUser!;

@@ -29,6 +29,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final loginFormKey = GlobalKey<FormState>();
   final secureStorageRepository = SecureStorageRepository();
+  String? emailError;
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +65,6 @@ class _LoginPageState extends State<LoginPage> {
               ],
             )));
   }
-
-  String? emailError;
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
 
   validateAndSaveForm() {
     final form = loginFormKey.currentState;
@@ -103,12 +102,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future openBiometricAuthDialog() async {
-    List isAuthenticated = await initBiometricAuthentication();
-    initBiometricLogin(isAuthenticated);
+    //get the list of authentication means on the user's device
+    List authentications = await initBiometricAuthentication();
+    initBiometricLogin(authentications);
   }
 
-  void initBiometricLogin(List isAuthenticated) async {
-    if (isAuthenticated[0] == true) {
+  void initBiometricLogin(List authentications) async {
+    if (authentications[0] == true) {
+      // fetch the saved value from the secure storage and assign to corresponding values
       String? email = await secureStorageRepository.getValue(secureEmail);
       String? password = await secureStorageRepository.getValue(securePassword);
 
@@ -124,19 +125,29 @@ class _LoginPageState extends State<LoginPage> {
             context, "Please signin with email & password at least once");
       }
     } else {
-      showErrorMessage(context, isAuthenticated[1] ?? "");
+      showErrorMessage(context, authentications[1] ?? "");
     }
   }
 
   checkForDialog(value) async {
+    //close the loading dialog
     Navigator.pop(context);
     if (value.runtimeType == String) {
       showErrorMessage(context, value);
     }
     bool isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+
+    // check if user email has been verified
     if (isEmailVerified) {
-      push(context: context, page: const VerifyEmail());
+      //if verified move the user to home page
+      push(context: context, page: const HomePage());
+
+      //if email is verified save the credentials for future biometric login
       saveCredentials();
+    } else {
+      //if unverified move the user to verify page
+
+      push(context: context, page: const VerifyEmail());
     }
   }
 
@@ -147,6 +158,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
+    // initializes the Text controllers
     initControllers();
     super.initState();
   }
@@ -158,6 +170,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   dispose() {
+    // dispose the following controllers to avoid memory leak
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();

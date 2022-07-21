@@ -50,7 +50,7 @@ void showErrorMessage(BuildContext context, String? message) async {
                 Column(
                   children: [
                     const Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      padding: EdgeInsets.symmetric(vertical: 5),
                       child: Icon(
                         Icons.cancel_outlined,
                         size: 60,
@@ -69,14 +69,4 @@ void showErrorMessage(BuildContext context, String? message) async {
           ),
         );
       });
-}
-
-class Utils {
-  static showSnackbar(String? message) {
-    if (message == null) return;
-    final snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: Colors.red,
-    );
-  }
 }
