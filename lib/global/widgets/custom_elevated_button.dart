@@ -24,6 +24,7 @@ class OurpassElevatedButton extends StatelessWidget {
         key: Key(buttonIdentifier),
         onPressed: onPressed,
         style: ButtonStyle(
+            minimumSize: MaterialStateProperty.all(const Size(15, 47)),
             backgroundColor: MaterialStateProperty.all<Color>(color)),
         child: isIconButton
             ? Icon(iconData)
