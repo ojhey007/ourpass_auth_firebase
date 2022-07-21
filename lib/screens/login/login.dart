@@ -1,13 +1,17 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ourpass/global/utility_function.dart';
+import 'package:ourpass/global/utils/app_constant.dart';
 import 'package:ourpass/global/utils/app_material_page_route.dart';
 import 'package:ourpass/global/utils/app_modal.dart';
 import 'package:ourpass/global/utils/navigation_fn.dart';
 import 'package:ourpass/global/widgets/custom_elevated_button.dart';
 import 'package:ourpass/global/widgets/form_spacer.dart';
 import 'package:ourpass/repository/auth_repository.dart';
+import 'package:ourpass/repository/storage_repository.dart';
 import 'package:ourpass/screens/home_page/home_page.dart';
 import 'package:ourpass/screens/sign_up/sign_up.dart';
 import 'package:ourpass/screens/verify_email/verify_email.dart';
@@ -24,6 +28,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final loginFormKey = GlobalKey<FormState>();
+  final secureStorageRepository = SecureStorageRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -84,22 +89,60 @@ class _LoginPageState extends State<LoginPage> {
     push(context: context, page: SignUp());
   }
 
-  signIn() {
+  signIn() async {
     if (validateAndSaveForm()) {
       showLoadingDialog(context);
-      context
+      await context
           .read<AuthRepository>()
           .signIn(
+              context: context,
               email: _emailController.text.trim(),
               password: _passwordController.text.trim())
           .then((value) => checkForDialog(value));
     }
   }
 
+  Future openBiometricAuthDialog() async {
+    List isAuthenticated = await initBiometricAuthentication();
+    initBiometricLogin(isAuthenticated);
+  }
+
+  void initBiometricLogin(List isAuthenticated) async {
+    if (isAuthenticated[0] == true) {
+      String? email = await secureStorageRepository.getValue(secureEmail);
+      String? password = await secureStorageRepository.getValue(securePassword);
+
+      if (email != null && password != null) {
+        _emailController.text = email;
+        _passwordController.text = password;
+
+        signIn();
+        return;
+      } else {
+        // ignore: use_build_context_synchronously
+        showErrorMessage(
+            context, "Please signin with email & password at least once");
+      }
+    } else {
+      showErrorMessage(context, isAuthenticated[1] ?? "");
+    }
+  }
+
   checkForDialog(value) async {
     Navigator.pop(context);
-    if (value.runtimeType == String) showErrorMessage(context, value);
-    // push(context: context, page: const VerifyEmail());
+    if (value.runtimeType == String) {
+      showErrorMessage(context, value);
+    }
+    bool isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+    if (isEmailVerified) {
+      push(context: context, page: const VerifyEmail());
+      saveCredentials();
+    }
+  }
+
+  saveCredentials() {
+    secureStorageRepository.saveValue(secureEmail, _emailController.text);
+    secureStorageRepository.saveValue(securePassword, _passwordController.text);
   }
 
   @override
@@ -153,10 +196,10 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: signIn,
         )),
         const FormSpacer(isVertical: false),
-        const OurpassElevatedButton(
+        OurpassElevatedButton(
           color: Colors.amber,
           isIconButton: true,
-          onPressed: null,
+          onPressed: openBiometricAuthDialog,
           iconData: Icons.fingerprint,
           buttonIdentifier: 'FingerPrintButton',
         )

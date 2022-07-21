@@ -31,26 +31,28 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               primarySwatch: Colors.cyan,
             ),
-            home: AuthWrapper()));
+            home: const AuthWrapper()));
   }
 }
 
 class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthRepository>(context);
-    return StreamBuilder(
-        stream: authService.user,
-        builder: (
-          _,
-          AsyncSnapshot<User?> snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            final User? user = snapshot.data;
-            return user == null ? LoginPage() : VerifyEmail();
-          }
-          return const Scaffold(
-              body: Center(child: CircularProgressIndicator()));
-        });
+    return Scaffold(
+        body: StreamBuilder(
+            stream: authService.user,
+            builder: (
+              _,
+              AsyncSnapshot<User?> snapshot,
+            ) {
+              if (snapshot.connectionState == ConnectionState.active) {
+                final User? user = snapshot.data;
+                return user == null ? LoginPage() : VerifyEmail();
+              }
+              return const Center(child: CircularProgressIndicator());
+            }));
   }
 }
